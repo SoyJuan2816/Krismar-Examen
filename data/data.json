@@ -1,0 +1,61 @@
+[
+    {
+      "grupo": 1,
+      "tipo": "fruta",
+      "detalle": "Arrastra la imagen al contenedor de la palabra que corresponda a la fruta correcta",
+      "objetos": [
+        {
+          "nombre": "Manzana",
+          "imagen": "../src/img/manzana.jpg"
+        },
+        {
+          "nombre": "Pera",
+          "imagen": "../src/img/pera.jpg"
+        },
+        {
+          "nombre": "Melón",
+          "imagen": "../src/img/melon.jpg"
+        },
+        {
+          "nombre": "Sandía",
+          "imagen": "../src/img/sandia.jpg"
+        },
+        {
+          "nombre": "Uva",
+          "imagen": "../src/img/uva.jpg"
+        },
+        {
+          "nombre": "Naranja",
+          "imagen": "../src/img/naranja.jpg"
+        }
+      ]
+    },
+    {
+      "grupo": 2,
+      "tipo": "transportes",
+      "detalle": "Arrastra la imagen al contenedor de la palabra que corresponda al transporte correcto",
+      "objetos": [
+        {
+          "nombre": "Avión",
+          "imagen": "../src/img/avion.jpg"
+        },
+        {
+          "nombre": "Auto",
+          "imagen": "../src/img/auto.jpg"
+        },
+        {
+          "nombre": "Bicicleta",
+          "imagen": "../src/img/bicicleta.jpg"
+        },
+        {
+          "nombre": "Tren",
+          "imagen": "../src/img/tren.jpg"
+        },
+        {
+          "nombre": "Helicóptero",
+          "imagen": "../src/img/helicoptero.jpg"
+        }
+      ]
+    }
+  ]
+  

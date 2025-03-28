@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="shortcut icon" type="image/png" href="src/img/favico.ico" >
+        <link rel="stylesheet" href="css/index.css">
+        <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+        <title>Home</title>
+    </head>
+    <body>
+        <div class="main">
+            <!-- Botón para mostrar información -->
+            <div class="info-container">
+                <button class="btn info-btn" onclick="showInfo()">Instrucciones</button>
+                <button class="btn reset-btn" onclick="resetLocalStorage()">Reiniciar Juego</button>
+                <button class="btn history-btn" onclick="historyScore()">Historial de puntajes</button>
+            </div>
+
+            <h1 id="detalle">Detalle</h1>
+
+            <!-- Contenedores para arrastrar y soltar -->
+            <div class="container-wrapper" id="containerWrapper">
+                <div class="container-item">
+                    <p id="obj1" class="label">Objeto 1</p>
+                    <div class="drop-container" id="drop1" ondragover="allowDrop(event)" ondrop="drop(event, 1)"></div>
+                </div>
+                <div class="container-item">
+                    <p id="obj2" class="label">Objeto 2</p>
+                    <div class="drop-container" id="drop2" ondragover="allowDrop(event)" ondrop="drop(event, 2)"></div>
+                </div>
+                <div class="container-item">
+                    <p id="obj3" class="label">Objeto 3</p>
+                    <div class="drop-container" id="drop3" ondragover="allowDrop(event)" ondrop="drop(event, 3)"></div>
+                </div>
+            </div>
+
+            <!-- Carrusel -->
+            <div class="carousel-container">
+                <div class="carousel-wrapper" id="carouselWrapper">
+                    <div class="carousel-wrapper" id="carouselWrapper"></div>
+                </div>
+
+                <!-- Botones de Navegación -->
+                <div class="btn-container">
+                    <button class="btn" onclick="moveCarousel(-1)">&#9664;</button>
+                    <button class="btn" onclick="moveCarousel(1)">&#9654;</button>
+                </div>
+            </div>
+
+            <!-- Botón para validar -->
+            <div class="validate-container">
+                <button class="btn validate-btn" onclick="validateSelection()">Validar</button>
+            </div>
+        </div>
+        <script src="js/index.js"></script>
+    </body>
+</html>
