@@ -1,8 +1,8 @@
-let currentIndex = 0;
+let indiceActual = 0;
 const totalItems = document.querySelectorAll('.carousel-item').length;
-const itemsPerView = 3;
+const itemsPorVista = 3;
 const wrapper = document.getElementById('carouselWrapper');
-let selectedImages = {};
+let imagenesSeleccionadas = {};
 
 /*
 
@@ -13,23 +13,23 @@ let selectedImages = {};
 */
 
 // Actualizar el número total de items después de cargar imágenes del JSON
-function updateTotalItems() {
+function actualizarTotalItems() {
     return document.querySelectorAll('.carousel-item').length;
 }
 
 // Mover carrusel
-function moveCarousel(direction) {
-    const totalItems = updateTotalItems();
-    const maxIndex = totalItems - itemsPerView;
-    currentIndex += direction;
+function moveCarousel(direccion) {
+    const totalItems = actualizarTotalItems();
+    const indiceMaximo = totalItems - itemsPorVista;
+    indiceActual += direccion;
 
-    if (currentIndex < 0) {
-        currentIndex = maxIndex;
-    } else if (currentIndex > maxIndex) {
-        currentIndex = 0;
+    if (indiceActual < 0) {
+        indiceActual = indiceMaximo;
+    } else if (indiceActual > indiceMaximo) {
+        indiceActual = 0;
     }
 
-    const offset = -(currentIndex * 210);
+    const offset = -(indiceActual * 210);
     wrapper.style.transform = `translateX(${offset}px)`;
 }
 
@@ -66,54 +66,54 @@ document.querySelectorAll('.carousel-item').forEach(item => {
 // Soltar en contenedor
 function drop(event, containerId) {
     event.preventDefault();
-    const imgId = event.dataTransfer.getData('text/plain');
-    const draggedElement = document.getElementById(imgId);
+    const imagenID = event.dataTransfer.getData('text/plain');
+    const imagenArrastrada = document.getElementById(imagenID);
 
-    if (draggedElement) {
-        if (!selectedImages[containerId]) {
-            addImageToContainer(containerId, draggedElement);
+    if (imagenArrastrada) {
+        if (!imagenesSeleccionadas[containerId]) {
+            addImageToContainer(containerId, imagenArrastrada);
         } else {
-            const prevImg = selectedImages[containerId];
+            const prevImg = imagenesSeleccionadas[containerId];
             prevImg.classList.remove('disabled');
             prevImg.setAttribute('draggable', true);
-            addImageToContainer(containerId, draggedElement);
+            addImageToContainer(containerId, imagenArrastrada);
         }
         
-        if (Object.keys(selectedImages).length > 0) {
-            saveGameState();
+        if (Object.keys(imagenesSeleccionadas).length > 0) {
+            guardarEstadoJuego();
         }
     }
 }
 
 // Añadir imagen al contenedor
-function addImageToContainer(containerId, draggedElement) {
-    const container = document.getElementById(`drop${containerId}`);
-    container.innerHTML = '';
+function addImageToContainer(containerId, imagenArrastrada) {
+    const contenedorDrop = document.getElementById(`divDrop${containerId}`);
+    contenedorDrop.innerHTML = '';
 
     // Clonar y añadir imagen al contenedor
-    const imgClone = draggedElement.querySelector('img').cloneNode(true);
-    container.appendChild(imgClone);
+    const imgClonada = imagenArrastrada.querySelector('img').cloneNode(true);
+    contenedorDrop.appendChild(imgClonada);
 
     // Eliminar con doble clic
-    imgClone.addEventListener('dblclick', () => {
-        removeImageFromContainer(containerId, draggedElement);
+    imgClonada.addEventListener('dblclick', () => {
+        eliminarSeleccion(containerId, imagenArrastrada);
     });
 
-    draggedElement.classList.add('disabled');
-    draggedElement.setAttribute('draggable', false);
+    imagenArrastrada.classList.add('disabled');
+    imagenArrastrada.setAttribute('draggable', false);
 
-    selectedImages[containerId] = draggedElement;
+    imagenesSeleccionadas[containerId] = imagenArrastrada;
 }
 
 // Eliminar imagen del contenedor y habilitar en carrusel
-function removeImageFromContainer(containerId, draggedElement) {
-    const container = document.getElementById(`drop${containerId}`);
-    container.innerHTML = '';
+function eliminarSeleccion(containerId, imagenArrastrada) {
+    const contenedorDrop = document.getElementById(`divDrop${containerId}`);
+    contenedorDrop.innerHTML = '';
 
-    draggedElement.classList.remove('disabled');
-    draggedElement.setAttribute('draggable', true);
+    imagenArrastrada.classList.remove('disabled');
+    imagenArrastrada.setAttribute('draggable', true);
 
-    delete selectedImages[containerId];
+    delete imagenesSeleccionadas[containerId];
 }
 
 // Asignar eventos drag and drop dinámicamente
@@ -148,7 +148,6 @@ async function cargarDatos() {
         const response = await fetch('../data/data.json');
         const datos = await response.json();
         data = datos;
-        //console.log(data);
         init();
     } catch (error) {
         console.error('Hubo un error al cargar el archivo JSON:', error);
@@ -156,9 +155,9 @@ async function cargarDatos() {
 }
 
 // Cambiar fondo según el grupo seleccionado
-function setBackground(selectedGroupIndex) {
+function setBackground(indexGrupoSeleccionado) {
     const body = document.body;
-    if (selectedGroupIndex === 0) {
+    if (indexGrupoSeleccionado === 0) {
         body.style.backgroundImage = "url('../src/img/back1.jpg')";
     } else {
         body.style.backgroundImage = "url('../src/img/back2.jpg')";
@@ -189,24 +188,24 @@ function shuffleArray(array) {
 
 */
 // Validación
-let correctCount = 0;
+let respuestasCorrectas = 0;
 let totalContainers = 3;
 function validateSelection() {
-    correctCount = 0;
+    respuestasCorrectas = 0;
     totalContainers = 3;
     let hasSelection = false;
 
     for (let i = 1; i <= totalContainers; i++) {
-        const container = document.getElementById(`drop${i}`);
-        const selectedImage = container.querySelector('img');
+        const contenedorDrop = document.getElementById(`divDrop${i}`);
+        const selectedImage = contenedorDrop.querySelector('img');
         
         if (selectedImage) {
             hasSelection = true;
             const imgAlt = selectedImage.alt.toLowerCase();
-            const expectedName = document.getElementById(`obj${i}`).innerText.toLowerCase();
+            const objEsperado = document.getElementById(`textObjeto_${i}`).innerText.toLowerCase();
 
-            if (imgAlt === expectedName) {
-                correctCount++;
+            if (imgAlt === objEsperado) {
+                respuestasCorrectas++;
             }
         }
     }
@@ -217,20 +216,20 @@ function validateSelection() {
         return;
     }
 
-    showResultMessage(correctCount, totalContainers);
+    msjResultado(respuestasCorrectas, totalContainers);
 }
 
 // Mostrar mensaje final según la cantidad correcta
-function showResultMessage(correctCount, totalContainers) {
-    const playerName = localStorage.getItem('playerName') || 'Jugador';
-    const score = Math.round((correctCount / totalContainers) * 100);
+function msjResultado(respuestasCorrectas, totalContainers) {
+    const nombreJugador = localStorage.getItem('playerName') || 'Jugador';
+    const score = Math.round((respuestasCorrectas / totalContainers) * 100);
 
-    if (correctCount === totalContainers) {
-        alert(`🎉 ¡Excelente trabajo, ${playerName}! Todas las imágenes son correctas.\n🏆 Puntaje: ${score}%`);
-    } else if (correctCount > 0) {
-        alert(`👍 Vas bien, ${playerName}.\n🏆 Puntaje: ${score}%`);
+    if (respuestasCorrectas === totalContainers) {
+        alert(`🎉 ¡Excelente trabajo, ${nombreJugador}! Todas las imágenes son correctas.\n🏆 Puntaje: ${score}%`);
+    } else if (respuestasCorrectas > 0) {
+        alert(`👍 Vas bien, ${nombreJugador}.\n🏆 Puntaje: ${score}%`);
     } else {
-        alert(`😢 Sigue intentándolo, ${playerName}. Esta vez no tuviste aciertos.\n🏆 Puntaje: ${score}%`);
+        alert(`😢 Sigue intentándolo, ${nombreJugador}. Esta vez no tuviste aciertos.\n🏆 Puntaje: ${score}%`);
     }
     resetGame();
 }
@@ -254,21 +253,21 @@ function showInfo() {
 
 
 */
-function saveGameState() {
+function guardarEstadoJuego() {
     // Verificar si al menos un contenedor tiene una imagen
     let hasImage = false;
-    const gameState = {
-        detalle: $('#detalle').text(),
-        selectedImages: {}
+    const estadoJuego = {
+        detalle: $('#textDetalle').text(),
+        imagenesSeleccionadas: {}
     };
 
     for (let i = 1; i <= 3; i++) {
-        const container = $(`#drop${i}`);
-        const selectedImage = container.find('img');
+        const contenedorDrop = $(`#divDrop${i}`);
+        const selectedImage = contenedorDrop.find('img');
 
         if (selectedImage.length > 0) {
             hasImage = true;
-            gameState.selectedImages[i] = {
+            estadoJuego.imagenesSeleccionadas[i] = {
                 src: selectedImage.attr('src'),
                 alt: selectedImage.attr('alt')
             };
@@ -277,20 +276,20 @@ function saveGameState() {
 
     // Solo guarda si al menos un contenedor tiene una imagen
     if (hasImage) {
-        localStorage.setItem('gameState', JSON.stringify(gameState));
+        localStorage.setItem('gameState', JSON.stringify(estadoJuego));
     }
 }
 
 // Eliminar imagen también actualiza el estado
-function removeImageFromContainer(containerId, draggedElement) {
-    const container = document.getElementById(`drop${containerId}`);
-    container.innerHTML = '';
+function eliminarSeleccion(containerId, imagenArrastrada) {
+    const contenedorDrop = document.getElementById(`divDrop${containerId}`);
+    contenedorDrop.innerHTML = '';
 
-    draggedElement.classList.remove('disabled');
-    draggedElement.setAttribute('draggable', true);
+    imagenArrastrada.classList.remove('disabled');
+    imagenArrastrada.setAttribute('draggable', true);
 
-    delete selectedImages[containerId];
-    saveGameState();
+    delete imagenesSeleccionadas[containerId];
+    guardarEstadoJuego();
 }
 
 /*
@@ -301,18 +300,18 @@ function removeImageFromContainer(containerId, draggedElement) {
 
 */
 function loadGameState() {
-    const gameState = localStorage.getItem('gameState');
-    if (gameState) {
-        const savedState = JSON.parse(gameState);
+    const estadoJuego = localStorage.getItem('gameState');
+    if (estadoJuego) {
+        const savedState = JSON.parse(estadoJuego);
 
-        $('#detalle').text(savedState.detalle);
+        $('#textDetalle').text(savedState.detalle);
 
         for (let i = 1; i <= 3; i++) {
-            if (savedState.selectedImages[i]) {
-                const container = $(`#drop${i}`);
-                const imgData = savedState.selectedImages[i];
+            if (savedState.imagenesSeleccionadas[i]) {
+                const contenedorDrop = $(`#divDrop${i}`);
+                const imgData = savedState.imagenesSeleccionadas[i];
 
-                container.html(`
+                contenedorDrop.html(`
                     <img src="${imgData.src}" alt="${imgData.alt}">
                 `);
 
@@ -324,9 +323,9 @@ function loadGameState() {
                 });
 
                 // Habilitar eliminación al hacer doble clic
-                container.find('img').on('dblclick', function () {
+                contenedorDrop.find('img').on('dblclick', function () {
                     const parentDiv = $(this).parent();
-                    removeImageFromContainer(i, parentDiv.find('img').get(0).parentNode);
+                    eliminarSeleccion(i, parentDiv.find('img').get(0).parentNode);
                 });
             }
         }
@@ -340,27 +339,27 @@ function loadGameState() {
 
 
 */
-function loadRandomGroup() {
-    const selectedGroupIndex = Math.floor(Math.random() * data.length);
-    const selectedGroup = data[selectedGroupIndex];
-    const otherGroup = data[selectedGroupIndex === 0 ? 1 : 0];
+function setRandomGroup() {
+    const indexGrupoSeleccionado = Math.floor(Math.random() * data.length);
+    const grupoSeleccionado = data[indexGrupoSeleccionado];
+    const otroGrupo = data[indexGrupoSeleccionado === 0 ? 1 : 0];
 
-    $('#detalle').text(selectedGroup.detalle);
-    setBackground(selectedGroupIndex);
+    $('#textDetalle').text(grupoSeleccionado.detalle);
+    setBackground(indexGrupoSeleccionado);
 
-    const selectedImages = getRandomItems(selectedGroup.objetos, 3);
+    const imagenesSeleccionadas = getRandomItems(grupoSeleccionado.objetos, 3);
     
-    const otherImages = getRandomItems(otherGroup.objetos, 2);
+    const otherImages = getRandomItems(otroGrupo.objetos, 2);
 
-    const allImages = [...selectedImages, ...otherImages];
+    const allImages = [...imagenesSeleccionadas, ...otherImages];
     shuffleArray(allImages);
 
-    loadImagesToCarousel(allImages);
+    setImgCarrusel(allImages);
 
-    const shuffledNames = shuffleArray([...selectedImages.map(item => item.nombre)]);
-    $('#obj1').text(shuffledNames[0] || 'Objeto 1');
-    $('#obj2').text(shuffledNames[1] || 'Objeto 2');
-    $('#obj3').text(shuffledNames[2] || 'Objeto 3');
+    const shuffledNames = shuffleArray([...imagenesSeleccionadas.map(item => item.nombre)]);
+    $('#textObjeto_1').text(shuffledNames[0] || 'Objeto 1');
+    $('#textObjeto_2').text(shuffledNames[1] || 'Objeto 2');
+    $('#textObjeto_3').text(shuffledNames[2] || 'Objeto 3');
 }
 
 /*
@@ -370,7 +369,7 @@ function loadRandomGroup() {
 
 
 */
-function loadImagesToCarousel(images) {
+function setImgCarrusel(images) {
     const carouselWrapper = $('#carouselWrapper');
     carouselWrapper.empty();
 
@@ -392,25 +391,25 @@ function loadImagesToCarousel(images) {
 
 
 */
-function loadSavedGroup(gameState) {
+function loadSavedGroup(estadoJuego) {
     // Encontrar el grupo seleccionado con los objetos
-    const selectedGroup = data.find(group => group.detalle === gameState.detalle);
+    const grupoSeleccionado = data.find(group => group.detalle === estadoJuego.detalle);
 
-    if (selectedGroup) {
-        setBackground(data.indexOf(selectedGroup));
-        $('#detalle').text(selectedGroup.detalle);
+    if (grupoSeleccionado) {
+        setBackground(data.indexOf(grupoSeleccionado));
+        $('#textDetalle').text(grupoSeleccionado.detalle);
 
         // Mostrar imágenes guardadas del grupo en el carrusel
-        loadImagesToCarousel(selectedGroup.objetos);
+        setImgCarrusel(grupoSeleccionado.objetos);
 
         // Cargar nombres de los objetos en los contenedores
-        const shuffledNames = shuffleArray(selectedGroup.objetos.map(item => item.nombre));
-        $('#obj1').text(shuffledNames[0] || 'Objeto 1');
-        $('#obj2').text(shuffledNames[1] || 'Objeto 2');
-        $('#obj3').text(shuffledNames[2] || 'Objeto 3');
+        const shuffledNames = shuffleArray(grupoSeleccionado.objetos.map(item => item.nombre));
+        $('#textObjeto_1').text(shuffledNames[0] || 'Objeto 1');
+        $('#textObjeto_2').text(shuffledNames[1] || 'Objeto 2');
+        $('#textObjeto_3').text(shuffledNames[2] || 'Objeto 3');
     } else {
         //console.error('No se encontró el grupo guardado. Cargando uno al azar...');
-        loadRandomGroup();
+        setRandomGroup();
     }
 }
 
@@ -422,27 +421,27 @@ function loadSavedGroup(gameState) {
 
 */
 function resetGame() {
-    const playerName = localStorage.getItem('playerName') || 'Jugador';
-    const score = Math.round((correctCount / totalContainers) * 100);
+    const nombreJugador = localStorage.getItem('playerName') || 'Jugador';
+    const score = Math.round((respuestasCorrectas / totalContainers) * 100);
     
-    savePlayerScore(playerName, score);
+    guardarPuntaje(nombreJugador, score);
 
     for (let i = 1; i <= 3; i++) {
-        $(`#drop${i}`).empty();
+        $(`#divDrop${i}`).empty();
     }
 
-    Object.keys(selectedImages).forEach(containerId => {
-        const draggedElement = selectedImages[containerId];
-        if (draggedElement) {
-            draggedElement.classList.remove('disabled');
-            draggedElement.setAttribute('draggable', true);
+    Object.keys(imagenesSeleccionadas).forEach(containerId => {
+        const imagenArrastrada = imagenesSeleccionadas[containerId];
+        if (imagenArrastrada) {
+            imagenArrastrada.classList.remove('disabled');
+            imagenArrastrada.setAttribute('draggable', true);
         }
     });
 
-    selectedImages = {};
+    imagenesSeleccionadas = {};
     localStorage.removeItem('gameState');
 
-    loadRandomGroup();
+    setRandomGroup();
 }
 
 // Cargar el estado si existe al iniciar
@@ -457,20 +456,20 @@ $(document).ready(function () {
 
 
 */
-function askUserName() {
-    let playerName = '';
+function getNombre() {
+    let nombreJugador = '';
 
     // Mostrar prompt hasta que el nombre no esté vacío
-    while (!playerName.trim()) {
-        playerName = prompt('👤 Ingresa tu nombre para comenzar:');
-        if (!playerName.trim()) {
+    while (!nombreJugador.trim()) {
+        nombreJugador = prompt('👤 Ingresa tu nombre para comenzar:');
+        if (!nombreJugador.trim()) {
             alert('⚠️ El nombre no puede estar vacío. Por favor, ingresa tu nombre.');
         }
     }
 
     // Guardar nombre en localStorage
-    localStorage.setItem('playerName', playerName);
-    alert(`🎮 ¡Bienvenido, ${playerName}! Que comience el juego.`);
+    localStorage.setItem('playerName', nombreJugador);
+    alert(`🎮 ¡Bienvenido, ${nombreJugador}! Que comience el juego.`);
 }
 
 /*
@@ -480,32 +479,32 @@ function askUserName() {
 
 
 */
-function savePlayerScore(playerName, score) {
+function guardarPuntaje(nombreJugador, score) {
     let playerScores = JSON.parse(localStorage.getItem('playerScores')) || {};
 
-    if (!playerScores[playerName]) {
-        playerScores[playerName] = [];
+    if (!playerScores[nombreJugador]) {
+        playerScores[nombreJugador] = [];
     }
 
-    playerScores[playerName].unshift(score);
+    playerScores[nombreJugador].unshift(score);
 
-    if (playerScores[playerName].length > 3) {
-        playerScores[playerName].pop();
+    if (playerScores[nombreJugador].length > 3) {
+        playerScores[nombreJugador].pop();
     }
 
     localStorage.setItem('playerScores', JSON.stringify(playerScores));
 }
 
-function historyScore() {
-    const playerName = localStorage.getItem('playerName') || 'Jugador';
+function historialPuntaje() {
+    const nombreJugador = localStorage.getItem('playerName') || 'Jugador';
     const playerScores = JSON.parse(localStorage.getItem('playerScores')) || {};
     
-    const scores = playerScores[playerName] || [];
+    const scores = playerScores[nombreJugador] || [];
 
     if (scores.length > 0) {
-        alert(`Puntajes de ${playerName}:\n\n${scores.join('\n')}`);
+        alert(`Puntajes de ${nombreJugador}:\n\n${scores.join('\n')}`);
     } else {
-        alert(`No hay puntajes guardados para ${playerName}.`);
+        alert(`No hay puntajes guardados para ${nombreJugador}.`);
     }
 }
 
@@ -518,16 +517,16 @@ function resetLocalStorage() {
 
 function init() {
     if (!localStorage.getItem('playerName')) {
-        askUserName();
+        getNombre();
     }
 
     const savedState = localStorage.getItem('gameState');
 
     if (savedState) {
-        const gameState = JSON.parse(savedState);
-        loadSavedGroup(gameState);
+        const estadoJuego = JSON.parse(savedState);
+        loadSavedGroup(estadoJuego);
     } else {
-        loadRandomGroup();
+        setRandomGroup();
     }
 }
 
